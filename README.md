@@ -16,4 +16,8 @@
 `oc expose service demo-app`
 
 ### Test your endpoint
+```
 curl -sw "\n" $(oc get routes demo-app -o jsonpath="{.spec.host}")/demo-app/hello
+```
+you should see a response 
+> Hello from demo-app-b5f99cd7d-cf97f
