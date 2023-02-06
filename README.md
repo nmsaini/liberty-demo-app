@@ -19,5 +19,14 @@
 ```
 curl -sw "\n" $(oc get routes demo-app -o jsonpath="{.spec.host}")/demo-app/hello
 ```
+
+### For secure/https endpoint
+```
+oc create route passthrough demo-app-quay-https --service demo-app-quay --port 9443
+```
+```
+curl --insecure -sw "\n" https://$(oc get routes demo-app-quay-https -o jsonpath="{.spec.host}")/demo-app/hello
+```
+
 you should see a response like
 > Hello from demo-app-b5f99cd7d-cf97f
