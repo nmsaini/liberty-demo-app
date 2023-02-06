@@ -11,5 +11,5 @@ RUN features.sh
 
 COPY --from=build --chown=1001:0 /app/target/*.war /config/apps
 RUN configure.sh
-EXPOSE 9080 
+EXPOSE 9080 9443
 
