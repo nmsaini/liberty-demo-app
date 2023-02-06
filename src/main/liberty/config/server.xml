@@ -3,7 +3,6 @@
 
     <!-- Enable features -->
     <featureManager>
-        <feature>jakartaee-8.0</feature>
         <feature>microProfile-4.1</feature>
     </featureManager>
 
