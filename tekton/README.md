@@ -92,7 +92,7 @@ oc import-image demoapp-quay --from quay.io/nsaini/liberty-demo-app:latest --con
 You don't have to manually do this as the pipeline does this as the last step. Once a new image is downloaded, your pods should be restarted with the new image. 
 
 
-### 5. Trigger pipeline with a code commit
+### 5. Trigger Pipeline with a code commit
 
 To do this integration we need to define a few more resources. 
 An EventListener which listens to the incoming hooks. A trigger that takes that requests and Intercepts it and validates. Once validated, A trigger binding usees the trigger template to trigger the pipeline. Lots of places to go wrong!
