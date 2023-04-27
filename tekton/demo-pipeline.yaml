@@ -1,0 +1,107 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: demoapp-build-deploy-pipeline
+spec:
+  params:
+  - default: https://github.com/nmsaini/liberty-demo-app.git
+    name: git-url
+    type: string
+  - default: liberty-demo-app
+    name: image-name
+    type: string
+  - default: demoapp-quay
+    name: deploy-name
+    type: string
+  tasks:
+  - name: clone-repo
+    params:
+    - name: url
+      value: $(params.git-url)
+    - name: revision
+      value: ""
+    - name: refspec
+      value: ""
+    - name: submodules
+      value: "true"
+    - name: depth
+      value: "1"
+    - name: sslVerify
+      value: "true"
+    - name: crtFileName
+      value: ca-bundle.crt
+    - name: subdirectory
+      value: ""
+    - name: sparseCheckoutDirectories
+      value: ""
+    - name: deleteExisting
+      value: "true"
+    - name: httpProxy
+      value: ""
+    - name: httpsProxy
+      value: ""
+    - name: noProxy
+      value: ""
+    - name: verbose
+      value: "true"
+    - name: gitInitImage
+      value: registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:a538c423e7a11aae6ae582a411fdb090936458075f99af4ce5add038bb6983e8
+    - name: userHome
+      value: /tekton/home
+    taskRef:
+      kind: ClusterTask
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: workspace
+    - name: ssh-directory
+      workspace: git-creds
+  - name: build-image
+    params:
+    - name: IMAGE
+      value: quay.io/nsaini/$(params.image-name)
+    - name: BUILDER_IMAGE
+      value: registry.redhat.io/rhel8/buildah@sha256:0a86ecbdfbe86e9d225b7fe4b090a0dd6d323f8afdfdf2bd933ff223ddb53320
+    - name: STORAGE_DRIVER
+      value: vfs
+    - name: DOCKERFILE
+      value: ./Dockerfile
+    - name: CONTEXT
+      value: .
+    - name: TLSVERIFY
+      value: "true"
+    - name: FORMAT
+      value: oci
+    - name: BUILD_EXTRA_ARGS
+      value: ""
+    - name: PUSH_EXTRA_ARGS
+      value: ""
+    - name: SKIP_PUSH
+      value: "false"
+    runAfter:
+    - clone-repo
+    taskRef:
+      kind: ClusterTask
+      name: buildah
+    workspaces:
+    - name: source
+      workspace: workspace
+    - name: dockerconfig
+      workspace: quayconfig
+  - name: refresh-image
+    params:
+    - name: SCRIPT
+      value: |-
+        #!/bin/bash
+        oc import-image $(params.deploy-name) --from quay.io/nsaini/$(params.image-name):latest --confirm
+    - name: VERSION
+      value: latest
+    runAfter:
+    - build-image
+    taskRef:
+      kind: ClusterTask
+      name: openshift-client
+  workspaces:
+  - name: workspace
+  - name: git-creds
+  - name: quayconfig
