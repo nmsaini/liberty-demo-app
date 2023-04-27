@@ -10,7 +10,7 @@ dnf install tektoncd-cli
 ```
 
 
-### 2. create demoapp
+### 2. Create demoapp
 
 create the demoapp (make sure you are in the correct namespace).
 ```
@@ -25,7 +25,7 @@ use a curl command to validate everything is working
 curl -sw "\n" $(oc get routes demoapp-quay -o jsonpath="{.spec.host}")/demo-app/hello
 ```
 
-### 3. create the pipeline
+### 3. Create the Pipeline
 
 Apply the pipeline yaml. First make sure you are either in the correct project or provide the namespace
 ```
@@ -64,7 +64,7 @@ oc create secret docker-registry quayconfig \
   --docker-password=XXXX -n liberty
 ```
 
-### 4. test the pipeline
+### 4. Test the Pipeline
 You can test the pipeline from the OCP console. Or use the command line using the Tekton CLI that you install in Step 1.
 As mentioned earlier i did test the pipeline with a private github repository just to test out my pipeline. Here is one private repo that i used.
 ```
@@ -92,7 +92,7 @@ oc import-image demoapp-quay --from quay.io/nsaini/liberty-demo-app:latest --con
 You don't have to manually do this as the pipeline does this as the last step. Once a new image is downloaded, your pods should be restarted with the new image. 
 
 
-### 5. setup a webhook to kick off the pipeline when a commit is made
+### 5. Trigger pipeline with a code commit
 
 To do this integration we need to define a few more resources. 
 An EventListener which listens to the incoming hooks. A trigger that takes that requests and Intercepts it and validates. Once validated, A trigger binding usees the trigger template to trigger the pipeline. Lots of places to go wrong!
@@ -113,7 +113,7 @@ oc get routes el-demoapp -o jsonpath="{.spec.host}"
 ```
 In addition you will need a secret string that you configure that your webhook needs to provide, else the interceptor will reject the request (security). 
 ```
-oc create secret generic --from-literal secretToken=<secretstring> -n liberty
+oc create secret generic github-secret --from-literal secretToken=<secretstring> -n liberty
 ```
 Now go to your github project settings. Select Tab to "Hooks" or "Webhooks", hit the "Add Webhook"
 Paste the url into the Payload URL. Make sure you append with "http://"
