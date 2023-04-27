@@ -85,9 +85,39 @@ tkn pipeline start demoapp-build-deploy-pipeline \
   --workspace name=git-creds,secret=git-creds \
   --use-param-defaults
 ```
-After a successful pipeline run, you should end up with a new quay image. This image is used in the pipeline to refresh your app image. You should see your pods restart!
+After a successful pipeline run, you should end up with a new quay image. In the third task of the pipeline, we are simply using this command to refresh the image. 
+```
+oc import-image demoapp-quay --from quay.io/nsaini/liberty-demo-app:latest --confirm
+```
+You don't have to manually do this as the pipeline does this as the last step. Once a new image is downloaded, your pods should be restarted with the new image. 
 
 
 ### 5. setup a webhook to kick off the pipeline when a commit is made
-/inc
 
+To do this integration we need to define a few more resources. 
+An EventListener which listens to the incoming hooks. A trigger that takes that requests and Intercepts it and validates. Once validated, A trigger binding usees the trigger template to trigger the pipeline. Lots of places to go wrong!
+
+```
+oc apply -f https://raw.githubusercontent.com/nmsaini/liberty-demo-app/main/tekton/event-trig-template-bindings.yaml -n liberty
+```
+
+This creates 4 resources. EventListener, Trigger, TriggerBindings, and TriggerTemplate. Since most of my params are fairly constant I am not parsing anything out of the webhook. Keep it simple.
+
+Once the eventlistener is created you will see a pod spin up. There is a corresponding service created. You will have to expose that service in order to use a webhook from outside your cluster.
+```
+oc expose svc el-demoapp
+```
+get the route 
+```
+oc get routes el-demoapp -o jsonpath="{.spec.host}"
+```
+In addition you will need a secret string that you configure that your webhook needs to provide, else the interceptor will reject the request (security). 
+```
+oc create secret generic --from-literal secretToken=<secretstring> -n liberty
+```
+Now go to your github project settings. Select Tab to "Hooks" or "Webhooks", hit the "Add Webhook"
+Paste the url into the Payload URL. Make sure you append with "http://"
+Change the content-type to "application/json" and paste the <secretstring> in the Secret.
+
+### 6. Test
+Make a change to your source code and commit. The commit should create a webhook that calls your route endpoint, that triggers your pipeline. This clones your code, builds it and deploys it!
