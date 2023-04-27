@@ -1,0 +1,78 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: trigger-demoapp
+spec:
+  bindings:
+    - kind: TriggerBinding
+      ref: tb-demoapp
+  interceptors:
+    - params:
+        - name: secretRef
+          value:
+            secretKey: secretToken
+            secretName: github-secret
+        - name: eventTypes
+          value:
+            - push
+      ref:
+        kind: ClusterInterceptor
+        name: github
+  serviceAccountName: pipeline
+  template:
+    ref: tt-demoapp
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: tt-demoapp
+spec:
+  params:
+    - description: The git repo url
+      name: git-repo-url
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: demoapp-pr-via-webhook-
+      spec:
+        params:
+          - name: git-url
+            value: https://github.com/nmsaini/liberty-demo-app.git
+          - name: image-name
+            value: liberty-demo-app
+          - name: deploy-name
+            value: demoapp-quay
+        pipelineRef:
+          name: demoapp-build-deploy-pipeline
+        workspaces:
+          - name: workspace
+            persistentVolumeClaim:
+              claimName: demoapp-build-pvc
+          - name: quayconfig
+            secret:
+              secretName: quayconfig
+          - name: git-creds
+            secret:
+              secretName: git-creds
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: tb-demoapp
+spec:
+  params:
+    - name: git-repo-url
+      value: $(body.repository.url)
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: el-demoapp
+spec:
+  namespaceSelector: {}
+  resources: {}
+  serviceAccountName: pipeline
+  triggers:
+    - triggerRef: trigger-demo
+
