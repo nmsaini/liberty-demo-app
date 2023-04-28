@@ -105,8 +105,10 @@ This creates 4 resources. EventListener, Trigger, TriggerBindings, and TriggerTe
 
 Once the eventlistener is created you will see a pod spin up. There is a corresponding service created. You will have to expose that service in order to use a webhook from outside your cluster.
 ```
-oc expose svc el-demoapp
+oc expose svc el-el-demoapp
 ```
+> :information_desk_person: for some reason the svc name is "el-" prepended to the name.
+
 get the route 
 ```
 oc get routes el-demoapp -o jsonpath="{.spec.host}"
