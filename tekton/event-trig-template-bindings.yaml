@@ -74,5 +74,5 @@ spec:
   resources: {}
   serviceAccountName: pipeline
   triggers:
-    - triggerRef: trigger-demo
+    - triggerRef: trigger-demoapp
 
