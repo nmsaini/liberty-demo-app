@@ -119,7 +119,7 @@ oc create secret generic github-secret --from-literal secretToken=<secretstring>
 ```
 Now go to your github project settings. Select Tab to "Hooks" or "Webhooks", hit the "Add Webhook"
 Paste the url into the Payload URL. Make sure you append with "http://"
-Change the content-type to "application/json" and paste the <secretstring> in the Secret.
+Change the content-type to "application/json" and paste <secretstring> in the Secret.
 
 ### 6. Test
 Make a change to your source code and commit. The commit should create a webhook that calls your route endpoint, that triggers your pipeline. This clones your code, builds it and deploys it!
