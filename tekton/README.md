@@ -123,3 +123,8 @@ Change the content-type to "application/json" and paste `secretstring` in the Se
 
 ### 6. Test
 Make a change to your source code and commit. The commit should create a webhook that calls your route endpoint, that triggers your pipeline. This clones your code, builds it and deploys it! If you would like to use a different source (private) repo, you can updated the values of the parameters for git-url in the trigger template.
+
+You can test with an empty commit.
+```
+git commit --allow-empty -m "Empty-Commit" && git push origin
+```
