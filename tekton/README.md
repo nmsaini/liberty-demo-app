@@ -111,7 +111,7 @@ oc expose svc el-el-demoapp
 
 get the route 
 ```
-oc get routes el-demoapp -o jsonpath="{.spec.host}"
+oc get routes el-el-demoapp -o jsonpath="{.spec.host}"
 ```
 In addition you will need a secret string that you configure that your webhook needs to provide, else the interceptor will reject the request (security). 
 ```
