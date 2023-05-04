@@ -100,9 +100,10 @@ spec:
                 number: 80
 " > liberty-demo-ingress.yaml
 ```
-The host is the DNS name of the host running the KIND cluster. You can change that to any valid dns that resolve to this HOST (as our ingress is running here).
+The host is the DNS name of the host running the KIND cluster. You can change that to any valid dns that resolves to this HOST (as our ingress is running here).
 
-We have another application running in our namespace exposing port 80, there you see another path being exposed. You can remove that from your yaml.
+We have another application running in our namespace exposing port 80, that is why you see another path being exposed. You can remove the 2nd pathType amd everything below from your yaml.
+
 Now lets create the ingress.
 ```
 kubectl apply -f liberty-demo-ingress.yaml
