@@ -108,5 +108,5 @@ Now lets create the ingress.
 kubectl apply -f liberty-demo-ingress.yaml
 ```
 
-It takes a few seconds for the ingress to start serving. You should be able to hit the host with the url http://<hostname>/demo-app/hello to get a response from your app!
+It takes a few seconds for the ingress to start serving. You should be able to hit the host with the url http://`hostname`/demo-app/hello to get a response from your app!
   
