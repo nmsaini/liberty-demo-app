@@ -102,7 +102,10 @@ spec:
 ```
 The host is the DNS name of the host running the KIND cluster. You can change that to any valid dns that resolves to this HOST (as our ingress is running here).
 
-We have another application running in our namespace exposing port 80, that is why you see another path being exposed. You can remove the 2nd pathType amd everything below from your yaml.
+We have another application running in our namespace exposing port 80, that is why you see another path being exposed. You can create this by running the following command.
+```
+kubectl run hello --expose --image nginxdemos/hello:plain-text --port 80
+```
 
 Now lets create the ingress.
 ```
